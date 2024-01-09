@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Acme Products</title>
+  </head>
+<body>
+  <div id="root"></div>
+</body>
+<!-- This setup is not suitable for production. -->
+<!-- Only use it in development! -->
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script async src="https://ga.jspm.io/npm:es-module-shims@1.7.0/dist/es-module-shims.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react?dev",
+    "react-dom/client": "https://esm.sh/react-dom/client?dev"
+  }
+}
+</script>
+<script type="text/babel" data-type="module">
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+const { useState, useEffect } = React;
+//const useState = React.useState;
+
+const Title = ({ count })=> {
+  return (
+    <h1>Acme Products { count }</h1>
+  );
+};
+
+const Products = ({ products })=> {
+  return (
+    <ul>
+      {
+        products.map((product)=> {
+          return (
+            <li key={ product.id }>
+              <a href={`#${product.id}`}>
+              { product.name }
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+  );
+};
+
+function App() {
+  const [products, setProducts] = useState([]);
+  const [selectedId, setSelectedId] = useState(window.location.hash.slice(1));
+  console.log(selectedId);
+
+  useEffect(()=> {
+    const fetchData = async()=>{
+      const response = await fetch('https://www.acme-api.com/api/products');
+      const json = await response.json();
+      setProducts(json);
+    }
+    fetchData();
+  }, [])
+
+  return (
+    <div>
+      <Title count={ products.length }/>
+      <Products products={ products }/>
+    </div>
+  );
+}
+
+const root = createRoot(document.getElementById('root'));
+root.render(
+  <App />
+);
+</script>
+</html>
