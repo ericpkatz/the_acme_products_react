@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>Acme Products</title>
+    <link href='styles.css' rel='stylesheet' />
   </head>
 <body>
   <div id="root"></div>
@@ -30,18 +31,34 @@ const Title = ({ count })=> {
   );
 };
 
-const Products = ({ products })=> {
+const ProductDetail = ({ product })=> {
+  return (
+    <li>
+      <h2><a href='#'>{ product.name }</a></h2>
+      { product. description }
+    </li>
+  );
+};
+
+const Products = ({ products, selectedId })=> {
   return (
     <ul>
       {
         products.map((product)=> {
-          return (
-            <li key={ product.id }>
-              <a href={`#${product.id}`}>
-              { product.name }
-              </a>
-            </li>
-          );
+          if(product.id === selectedId){
+            return (
+              <ProductDetail key={ product.id } product={ product }/>
+            );
+          }
+          else {
+            return (
+              <li key={ product.id }>
+                <a href={`#${product.id}`}>
+                { product.name }
+                </a>
+              </li>
+            );
+          }
         })
       }
     </ul>
@@ -51,7 +68,12 @@ const Products = ({ products })=> {
 function App() {
   const [products, setProducts] = useState([]);
   const [selectedId, setSelectedId] = useState(window.location.hash.slice(1));
-  console.log(selectedId);
+  
+  useEffect(()=> {
+    window.addEventListener('hashchange', ()=>{
+      setSelectedId(window.location.hash.slice(1));
+    })
+  }, []);
 
   useEffect(()=> {
     const fetchData = async()=>{
@@ -65,7 +87,7 @@ function App() {
   return (
     <div>
       <Title count={ products.length }/>
-      <Products products={ products }/>
+      <Products products={ products } selectedId={ selectedId }/>
     </div>
   );
 }
